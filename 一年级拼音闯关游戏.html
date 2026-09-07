@@ -606,12 +606,48 @@ function sfxCorrect(){ tone(660,0.12,0,"triangle"); tone(880,0.18,0.1,"triangle"
 function sfxWrong(){ tone(220,0.2,0,"sawtooth",0.1); tone(160,0.25,0.12,"sawtooth",0.1); }
 function sfxStar(){ [523,659,784,1046].forEach((f,i)=>tone(f,0.25,i*0.14,"triangle",0.15)); }
 function sfxClick(){ tone(500,0.06,0,"sine",0.08); }
+let _ttsVoices = [];
+function _refreshVoices(){
+  try { _ttsVoices = window.speechSynthesis ? speechSynthesis.getVoices() : []; } catch(e){}
+}
+if ("speechSynthesis" in window){
+  _refreshVoices();
+  /* 语音列表是异步加载的，加载完刷新一次缓存 */
+  if (typeof speechSynthesis.onvoiceschanged !== "undefined")
+    speechSynthesis.onvoiceschanged = ()=>{ _refreshVoices(); };
+}
+/* 挑一个能说中文的语音（优先 Windows/Edge 本地中文音，其次任意 zh 语音） */
+function _zhVoice(){
+  try {
+    _refreshVoices();
+    const zh = _ttsVoices.filter(v=>/^zh/i.test(v.lang || ""));
+    if (!zh.length) return null;
+    const want = ["Xiaoxiao","Yunxi","Yunjian","Yunyang","Xiaoyi","Kangkang","Huihui","Yaoyao","Meijia","Hanhan","Lili","Tingting","Sinji","Google 普通话"];
+    for (const w of want){ const hit = zh.find(v=>v.name.indexOf(w) >= 0); if (hit) return hit; }
+    return zh[0];
+  } catch(e){ return null; }
+}
+let _ttsTimer = null;
 function speak(text){
   try {
-    if (!("speechSynthesis" in window)) return;
+    if (!("speechSynthesis" in window) || !text) return;
     speechSynthesis.cancel();
+    if (_ttsTimer){ clearInterval(_ttsTimer); _ttsTimer = null; }
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "zh-CN"; u.rate = 0.75;
+    u.lang = "zh-CN";
+    u.rate = 0.85; u.pitch = 1.05; u.volume = 1;
+    const voice = _zhVoice();
+    if (voice) u.voice = voice;
+    const start = Date.now();
+    /* 保活：Chrome 播报约 15 秒后会自动静音，定时暂停再继续以重置计时 */
+    _ttsTimer = setInterval(()=>{
+      try {
+        if (speechSynthesis.speaking && Date.now() - start > 12000){
+          speechSynthesis.pause(); speechSynthesis.resume();
+        }
+      } catch(e){}
+    }, 1000);
+    u.onend = u.onerror = ()=>{ if (_ttsTimer){ clearInterval(_ttsTimer); _ttsTimer = null; } };
     speechSynthesis.speak(u);
   } catch(e){}
 }
