@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一年级拼音闯关之旅</title>
+<style>
+/* ============ Cute Design System ============ */
+:root {
+  --pink: #FF7EB3;
+  --pink-light: #FFB6D3;
+  --pink-bg: #FFF0F5;
+  --peach: #FFB088;
+  --purple: #C4A6FF;
+  --purple-light: #E8DFFF;
+  --mint: #7ED9C4;
+  --mint-light: #C8F0E4;
+  --yellow: #FFD93D;
+  --yellow-light: #FFF3B8;
+  --sky: #87CEEB;
+  --sky-light: #C5E8F7;
+  --green: #6BCB77;
+  --red: #FF6B6B;
+  --text: #5D4E6D;
+  --text-light: #9B8EAA;
+  --white: #FFFFFF;
+  --shadow-card: 0 6px 20px rgba(180,160,200,0.15);
+  --shadow-hover: 0 10px 30px rgba(180,160,200,0.25);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 34px;
+  --bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: 'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;
+  background: linear-gradient(170deg, #FFF0F8 0%, #F8F0FF 25%, #F0F8FF 50%, #FFF8F0 75%, #FFF0F5 100%);
+  background-attachment: fixed;
+  min-height: 100vh; color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ============ Floating Bubbles ============ */
+.bubbles-bg { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+.bubble { position:absolute; border-radius:50%; opacity:0.35; animation:floatUp linear infinite; }
+@keyframes floatUp {
+  0% { transform:translateY(105vh) scale(0); opacity:0; }
+  10% { opacity:0.4; }
+  90% { opacity:0.4; }
+  100% { transform:translateY(-10vh) scale(1); opacity:0; }
+}
+
+/* ============ Header ============ */
+.header {
+  background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 50%, var(--sky) 100%);
+  color:#fff; padding:26px 16px 20px; text-align:center;
+  border-radius:0 0 var(--radius-xl) var(--radius-xl);
+  box-shadow:0 8px 30px rgba(200,150,220,0.3);
+  position:relative; overflow:hidden; z-index:2;
+}
+.header h1 { font-size:26px; letter-spacing:2px; text-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.header .subtitle { margin-top:6px; font-size:14px; opacity:0.95; }
+.header .star-total {
+  display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+  background:rgba(255,255,255,0.25); padding:6px 16px; border-radius:20px;
+  font-size:15px; font-weight:bold;
+}
+
+/* ============ Main container ============ */
+.container { max-width:900px; margin:0 auto; padding:20px 16px 60px; position:relative; z-index:1; }
+.screen { display:none; animation:fadeIn 0.4s ease; }
+.screen.active { display:block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(12px);} to { opacity:1; transform:translateY(0);} }
+
+/* ============ Level Map ============ */
+.map-title { text-align:center; font-size:20px; font-weight:bold; margin:18px 0 6px; }
+.map-sub { text-align:center; font-size:13px; color:var(--text-light); margin-bottom:18px; }
+.level-grid { display:flex; flex-direction:column; gap:14px; }
+.level-row { display:flex; align-items:center; gap:14px; background:var(--white);
+  border-radius:var(--radius-lg); padding:14px 16px; box-shadow:var(--shadow-card);
+  cursor:pointer; transition:transform 0.25s var(--bounce), box-shadow 0.25s; border:3px solid transparent;
+}
+.level-row:nth-child(odd) { margin-right:24px; }
+.level-row:nth-child(even) { margin-left:24px; }
+.level-row:hover { transform:translateY(-3px) scale(1.01); box-shadow:var(--shadow-hover); }
+.level-row.locked { cursor:not-allowed; opacity:0.55; filter:grayscale(0.7); }
+.level-row.locked:hover { transform:none; box-shadow:var(--shadow-card); }
+.level-num {
+  width:58px; height:58px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; font-weight:bold; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.15);
+  box-shadow:inset 0 -4px 8px rgba(0,0,0,0.08);
+}
+.level-info { flex:1; min-width:0; }
+.level-name { font-size:17px; font-weight:bold; }
+.level-py { font-size:13px; color:var(--text-light); margin-top:3px; letter-spacing:1px; }
+.level-stars { font-size:20px; letter-spacing:2px; flex-shrink:0; }
+.reset-btn {
+  display:block; margin:30px auto 0; background:var(--white); color:var(--text-light);
+  border:2px dashed #D8CCE8; border-radius:20px; padding:8px 22px; font-size:13px; cursor:pointer;
+  font-family:inherit; transition:all 0.2s;
+}
+.reset-btn:hover { color:var(--red); border-color:var(--red); }
+
+/* ============ Learn Screen ============ */
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.back-btn {
+  background:var(--white); border:none; border-radius:16px; padding:9px 18px;
+  font-size:15px; font-weight:bold; color:var(--text); cursor:pointer;
+  box-shadow:var(--shadow-card); font-family:inherit; transition:transform 0.2s var(--bounce);
+}
+.back-btn:hover { transform:scale(1.06); }
+.level-badge {
+  font-size:16px; font-weight:bold; color:#fff; padding:9px 20px; border-radius:20px;
+  box-shadow:var(--shadow-card);
+}
+.chips { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.chip {
+  border:none; border-radius:14px; padding:8px 14px; font-size:16px; font-weight:bold;
+  font-family:inherit; cursor:pointer; background:var(--white); color:var(--text-light);
+  box-shadow:var(--shadow-card); transition:all 0.2s var(--bounce);
+}
+.chip.active { background:var(--purple); color:#fff; transform:scale(1.12); }
+.learn-card {
+  background:var(--white); border-radius:var(--radius-xl); padding:26px 22px;
+  box-shadow:var(--shadow-card); text-align:center; animation:cardPop 0.35s var(--bounce);
+}
+@keyframes cardPop { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+.py-type {
+  display:inline-block; font-size:13px; font-weight:bold; color:#fff;
+  padding:4px 14px; border-radius:12px; margin-bottom:10px; letter-spacing:1px;
+}
+.big-py { font-size:76px; font-weight:900; line-height:1.1; cursor:pointer; }
+.py-tip {
+  font-size:15px; color:var(--text-light); background:var(--yellow-light);
+  display:inline-block; padding:6px 18px; border-radius:14px; margin:8px 0 18px;
+}
+.char-block {
+  border-radius:var(--radius-md); padding:16px 14px; margin:10px 0; text-align:left;
+}
+.char-block.a { background:var(--pink-bg); }
+.char-block.b { background:var(--sky-light); }
+.char-head { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+.char-itself { font-size:52px; font-weight:900; line-height:1; }
+.char-py { font-size:24px; font-weight:bold; color:var(--purple); }
+.speak-btn {
+  margin-left:auto; border:none; background:var(--white); border-radius:50%;
+  width:40px; height:40px; font-size:18px; cursor:pointer; box-shadow:var(--shadow-card);
+  transition:transform 0.2s var(--bounce); font-family:inherit;
+}
+.speak-btn:hover { transform:scale(1.15); }
+.idiom-title { font-size:13px; color:var(--text-light); margin-bottom:8px; font-weight:bold; }
+.idiom-list { display:flex; flex-wrap:wrap; gap:8px; }
+.idiom {
+  background:var(--white); border-radius:12px; padding:8px 12px; font-size:17px; font-weight:bold;
+  box-shadow:0 2px 8px rgba(180,160,200,0.18); cursor:pointer; transition:transform 0.2s var(--bounce);
+  letter-spacing:1px;
+}
+.idiom:hover { transform:scale(1.06); background:var(--mint-light); }
+.learn-nav { display:flex; justify-content:space-between; margin-top:18px; gap:10px; }
+.nav-btn {
+  flex:1; border:none; border-radius:18px; padding:14px 10px; font-size:16px; font-weight:bold;
+  font-family:inherit; cursor:pointer; color:#fff; box-shadow:var(--shadow-card);
+  transition:transform 0.2s var(--bounce); max-width:180px;
+}
+.nav-btn:hover { transform:translateY(-2px); }
+.nav-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.start-quiz-btn {
+  flex:2.2; border:none; border-radius:18px; padding:14px 10px; font-size:18px; font-weight:bold;
+  font-family:inherit; cursor:pointer; color:#fff; box-shadow:0 6px 20px rgba(255,140,120,0.4);
+  background:linear-gradient(135deg,#FF9A76,#FF6B9B); letter-spacing:2px;
+  transition:transform 0.2s var(--bounce);
+}
+.start-quiz-btn:hover { transform:translateY(-2px) scale(1.02); }
+
+/* ============ Quiz ============ */
+.quiz-card {
+  background:var(--white); border-radius:var(--radius-xl); padding:24px 20px;
+  box-shadow:var(--shadow-card); text-align:center; animation:cardPop 0.35s var(--bounce);
+}
+.quiz-progress { display:flex; gap:6px; justify-content:center; margin-bottom:16px; }
+.q-dot { width:12px; height:12px; border-radius:50%; background:#E8E0F0; transition:all 0.3s; }
+.q-dot.done { background:var(--green); }
+.q-dot.now { background:var(--purple); transform:scale(1.4); }
+.q-count { font-size:13px; color:var(--text-light); margin-bottom:10px; font-weight:bold; }
+.q-prompt { font-size:24px; font-weight:bold; margin:6px 0 20px; line-height:1.5; letter-spacing:1px; }
+.q-prompt .blank { color:var(--pink); font-size:30px; }
+.q-prompt .py-hl { color:var(--purple); font-size:30px; }
+.q-char { font-size:72px; font-weight:900; line-height:1.2; margin:2px 0 16px; cursor:pointer; }
+.options { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.opt-btn {
+  border:3px solid #EEE5F5; border-radius:var(--radius-md); background:var(--white);
+  padding:16px 10px; font-size:24px; font-weight:bold; font-family:inherit; cursor:pointer;
+  color:var(--text); transition:all 0.2s var(--bounce); letter-spacing:1px;
+}
+.opt-btn:hover:not(:disabled) { border-color:var(--purple-light); transform:translateY(-2px); background:var(--purple-light); }
+.opt-btn:disabled { cursor:default; }
+.opt-btn.correct { background:var(--mint-light); border-color:var(--green); color:#2E7D4F; animation:optBounce 0.5s var(--bounce); }
+.opt-btn.wrong { background:#FFE3E3; border-color:var(--red); color:#C0392B; animation:shake 0.4s; }
+@keyframes optBounce { 0%{transform:scale(1);} 40%{transform:scale(1.1);} 100%{transform:scale(1);} }
+@keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);} 60%{transform:translateX(-5px);} 80%{transform:translateX(5px);} }
+.feedback { min-height:52px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin-top:16px; gap:8px; }
+.feedback span { font-size:20px; font-weight:bold; padding:8px 22px; border-radius:20px; animation:cardPop 0.3s var(--bounce); }
+.feedback .good { background:var(--mint-light); color:#2E7D4F; }
+.feedback .bad { background:#FFE3E3; color:#C0392B; }
+.q-reveal { font-size:15px; background:var(--yellow-light); padding:7px 16px; border-radius:12px; color:var(--text); animation:cardPop 0.3s var(--bounce); }
+.spell-built { text-align:center; font-size:24px; font-weight:bold; color:var(--purple); margin-top:14px; letter-spacing:2px; }
+.spell-built:empty { display:none; }
+.options .spell-label { grid-column:1/-1; text-align:center; font-size:15px; font-weight:bold; color:var(--purple); padding-bottom:4px; }
+.spell-line { background:rgba(255,255,255,0.8); border-radius:12px; padding:8px 12px; font-size:15px; margin-bottom:10px; line-height:1.7; }
+.spell-line b { color:var(--purple); font-size:17px; }
+
+/* ============ Result ============ */
+.result-card {
+  background:var(--white); border-radius:var(--radius-xl); padding:34px 22px;
+  box-shadow:var(--shadow-card); text-align:center; animation:cardPop 0.4s var(--bounce);
+}
+.result-emoji { font-size:64px; }
+.result-title { font-size:28px; font-weight:900; margin:10px 0; }
+.result-stars { font-size:54px; letter-spacing:6px; margin:10px 0 6px; }
+.result-stars .star { display:inline-block; animation:starPop 0.5s var(--bounce) backwards; }
+.result-stars .star:nth-child(2){ animation-delay:0.2s; }
+.result-stars .star:nth-child(3){ animation-delay:0.4s; }
+@keyframes starPop { from { transform:scale(0) rotate(-90deg);} to { transform:scale(1) rotate(0);} }
+.result-msg { font-size:16px; color:var(--text-light); margin-bottom:8px; }
+.result-score { font-size:15px; color:var(--text-light); margin-bottom:22px; }
+.result-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.result-btn {
+  border:none; border-radius:18px; padding:13px 26px; font-size:16px; font-weight:bold;
+  font-family:inherit; cursor:pointer; color:#fff; box-shadow:var(--shadow-card);
+  transition:transform 0.2s var(--bounce); letter-spacing:1px;
+}
+.result-btn:hover { transform:translateY(-2px); }
+
+/* ============ Confetti ============ */
+.confetti { position:fixed; top:-20px; z-index:99; pointer-events:none; border-radius:4px; animation:confettiFall linear forwards; }
+@keyframes confettiFall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0.6; }
+}
+
+/* ============ Toast ============ */
+.toast {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(93,78,109,0.92); color:#fff; font-size:18px; font-weight:bold;
+  padding:14px 30px; border-radius:22px; z-index:100; animation:cardPop 0.3s var(--bounce);
+  pointer-events:none;
+}
+
+@media (max-width:520px) {
+  .header h1 { font-size:21px; }
+  .big-py { font-size:60px; }
+  .char-itself { font-size:42px; }
+  .q-prompt { font-size:20px; }
+  .q-prompt .py-hl { font-size:26px; }
+  .q-char { font-size:56px; }
+  .opt-btn { font-size:20px; padding:14px 6px; }
+  .level-row:nth-child(odd) { margin-right:8px; }
+  .level-row:nth-child(even) { margin-left:8px; }
+  .level-num { width:48px; height:48px; font-size:20px; }
+}
+</style>
+</head>
+<body>
+<div class="bubbles-bg" id="bubblesBg"></div>
+
+<div class="header">
+  <h1>🎈 拼音闯关之旅 🎈</h1>
+  <div class="subtitle">拼一拼 · 读一读 · 成语积累</div>
+  <div class="star-total">⭐ <span id="totalStars">0</span> / <span id="maxStars">39</span> 颗星星</div>
+</div>
+
+<div class="container">
+  <!-- 关卡地图 -->
+  <div class="screen active" id="screenMap">
+    <div class="map-title">🗺️ 选择关卡出发吧！</div>
+    <div class="map-sub">每关学习 5 个拼音：拼声母、选韵母、辨声调，闯关赢星星 ⭐</div>
+    <div class="level-grid" id="levelGrid"></div>
+    <button class="reset-btn" id="resetBtn">🗑️ 清空进度，重新开始</button>
+  </div>
+
+  <!-- 学习 -->
+  <div class="screen" id="screenLearn">
+    <div class="topbar">
+      <button class="back-btn" id="learnBack">🏠 返回地图</button>
+      <div class="level-badge" id="learnBadge">第 1 关</div>
+    </div>
+    <div class="chips" id="learnChips"></div>
+    <div class="learn-card" id="learnCard"></div>
+    <div class="learn-nav">
+      <button class="nav-btn" id="prevPy" style="background:linear-gradient(135deg,#B8A4D8,#9B8EC8);">⬅️ 上一个</button>
+      <button class="start-quiz-btn" id="startQuiz">🚀 开始闯关！</button>
+      <button class="nav-btn" id="nextPy" style="background:linear-gradient(135deg,#B8A4D8,#9B8EC8);">下一个 ➡️</button>
+    </div>
+  </div>
+
+  <!-- 答题 -->
+  <div class="screen" id="screenQuiz">
+    <div class="topbar">
+      <button class="back-btn" id="quizBack">↩️ 放弃闯关</button>
+      <div class="level-badge" id="quizBadge">第 1 关</div>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizDots"></div>
+      <div class="q-count" id="qCount"></div>
+      <div class="q-prompt" id="qPrompt"></div>
+      <div class="q-char" id="qChar"></div>
+      <div class="options" id="qOptions"></div>
+      <div class="spell-built" id="spellBuilt"></div>
+      <div class="feedback" id="qFeedback"></div>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="screen" id="screenResult">
+    <div class="result-card" id="resultCard"></div>
+  </div>
+</div>
+
+<script>
+/* ==================== 拼音数据（一年级全量：23声母+24韵母+16整体认读） ==================== */
+const DATA = [
+{ name:"拼音果园", emoji:"🍎", items:[
+ {p:"b",type:"声母",tip:"右下半圆 b b b",chars:[
+  {c:"白",py:"bái",idioms:["白手起家","真相大白","白头偕老"]},
+  {c:"百",py:"bǎi",idioms:["百发百中","千方百计","百花齐放"]}]},
+ {p:"p",type:"声母",tip:"右上半圆 p p p",chars:[
+  {c:"平",py:"píng",idioms:["平分秋色","平易近人","四平八稳"]},
+  {c:"破",py:"pò",idioms:["破釜沉舟","势如破竹","不攻自破"]}]},
+ {p:"m",type:"声母",tip:"两个门洞 m m m",chars:[
+  {c:"马",py:"mǎ",idioms:["马到成功","一马当先","万马奔腾"]},
+  {c:"满",py:"mǎn",idioms:["满载而归","心满意足","满面春风"]}]},
+ {p:"f",type:"声母",tip:"伞柄朝上 f f f",chars:[
+  {c:"风",py:"fēng",idioms:["风和日丽","一路顺风","风调雨顺"]},
+  {c:"飞",py:"fēi",idioms:["龙飞凤舞","飞蛾扑火","不翼而飞"]}]},
+ {p:"d",type:"声母",tip:"左下半圆 d d d",chars:[
+  {c:"大",py:"dà",idioms:["大显身手","大快人心","光明正大"]},
+  {c:"东",py:"dōng",idioms:["东张西望","声东击西","旭日东升"]}]}
+]},
+{ name:"糖果城堡", emoji:"🍭", items:[
+ {p:"t",type:"声母",tip:"伞柄朝下 t t t",chars:[
+  {c:"天",py:"tiān",idioms:["天长地久","翻天覆地","坐井观天"]},
+  {c:"同",py:"tóng",idioms:["同甘共苦","异口同声","志同道合"]}]},
+ {p:"n",type:"声母",tip:"一个门洞 n n n",chars:[
+  {c:"南",py:"nán",idioms:["南辕北辙","走南闯北","南征北战"]},
+  {c:"鸟",py:"niǎo",idioms:["鸟语花香","笨鸟先飞","一石二鸟"]}]},
+ {p:"l",type:"声母",tip:"一根小棒 l l l",chars:[
+  {c:"龙",py:"lóng",idioms:["生龙活虎","画龙点睛","望子成龙"]},
+  {c:"乐",py:"lè",idioms:["乐在其中","助人为乐","安居乐业"]}]},
+ {p:"g",type:"声母",tip:"9 字加钩 g g g",chars:[
+  {c:"高",py:"gāo",idioms:["高瞻远瞩","兴高采烈","水涨船高"]},
+  {c:"功",py:"gōng",idioms:["功成名就","事半功倍","汗马功劳"]}]},
+ {p:"k",type:"声母",tip:"一挺机枪 k k k",chars:[
+  {c:"刻",py:"kè",idioms:["刻舟求剑","精雕细刻","一时半刻"]},
+  {c:"口",py:"kǒu",idioms:["口是心非","有口皆碑","心直口快"]}]}
+]},
+{ name:"彩虹桥", emoji:"🌈", items:[
+ {p:"h",type:"声母",tip:"一把椅子 h h h",chars:[
+  {c:"花",py:"huā",idioms:["花好月圆","锦上添花","鸟语花香"]},
+  {c:"海",py:"hǎi",idioms:["海阔天空","人山人海","海底捞月"]}]},
+ {p:"j",type:"声母",tip:"竖弯加点 j j j",chars:[
+  {c:"金",py:"jīn",idioms:["一诺千金","点石成金","金枝玉叶"]},
+  {c:"井",py:"jǐng",idioms:["井底之蛙","坐井观天","背井离乡"]}]},
+ {p:"q",type:"声母",tip:"左上半圆 q q q",chars:[
+  {c:"千",py:"qiān",idioms:["千军万马","千变万化","千辛万苦"]},
+  {c:"青",py:"qīng",idioms:["青山绿水","青出于蓝","万古长青"]}]},
+ {p:"x",type:"声母",tip:"两个叉叉 x x x",chars:[
+  {c:"心",py:"xīn",idioms:["一心一意","万众一心","心花怒放"]},
+  {c:"学",py:"xué",idioms:["学无止境","勤学苦练","学以致用"]}]},
+ {p:"zh",type:"声母",tip:"蜘蛛织网 zh zh zh",chars:[
+  {c:"知",py:"zhī",idioms:["知己知彼","知足常乐","温故知新"]},
+  {c:"竹",py:"zhú",idioms:["胸有成竹","势如破竹","竹报平安"]}]}
+]},
+{ name:"星星乐园", emoji:"⭐", items:[
+ {p:"ch",type:"声母",tip:"吃苹果啦 ch ch ch",chars:[
+  {c:"成",py:"chéng",idioms:["成千上万","水到渠成","大器晚成"]},
+  {c:"出",py:"chū",idioms:["出人头地","水落石出","别出心裁"]}]},
+ {p:"sh",type:"声母",tip:"狮子吼叫 sh sh sh",chars:[
+  {c:"水",py:"shuǐ",idioms:["水滴石穿","山清水秀","如鱼得水"]},
+  {c:"山",py:"shān",idioms:["愚公移山","开门见山","万水千山"]}]},
+ {p:"r",type:"声母",tip:"小苗发芽 r r r",chars:[
+  {c:"日",py:"rì",idioms:["日新月异","日积月累","一日千里"]},
+  {c:"入",py:"rù",idioms:["入木三分","引人入胜","先入为主"]}]},
+ {p:"z",type:"声母",tip:"像个 2 字 z z z",chars:[
+  {c:"自",py:"zì",idioms:["自力更生","自相矛盾","自告奋勇"]},
+  {c:"走",py:"zǒu",idioms:["走马观花","不胫而走","远走高飞"]}]},
+ {p:"c",type:"声母",tip:"半个圆圈 c c c",chars:[
+  {c:"才",py:"cái",idioms:["才高八斗","德才兼备","人尽其才"]},
+  {c:"草",py:"cǎo",idioms:["草木皆兵","风吹草动","寸草春晖"]}]}
+]},
+{ name:"月亮船", emoji:"🌙", items:[
+ {p:"s",type:"声母",tip:"半个 8 字 s s s",chars:[
+  {c:"三",py:"sān",idioms:["三心二意","举一反三","三顾茅庐"]},
+  {c:"四",py:"sì",idioms:["四面八方","四通八达","名扬四海"]}]},
+ {p:"y",type:"声母",tip:"树杈树杈 y y y",chars:[
+  {c:"一",py:"yī",idioms:["一鸣惊人","一帆风顺","独一无二"]},
+  {c:"言",py:"yán",idioms:["言而有信","一言九鼎","言归于好"]}]},
+ {p:"w",type:"声母",tip:"屋顶屋顶 w w w",chars:[
+  {c:"五",py:"wǔ",idioms:["五光十色","五花八门","五谷丰登"]},
+  {c:"万",py:"wàn",idioms:["万紫千红","万无一失","一本万利"]}]},
+ {p:"a",type:"单韵母",tip:"张大嘴巴 a a a",chars:[
+  {c:"发",py:"fā",idioms:["发扬光大","整装待发","意气风发"]},
+  {c:"家",py:"jiā",idioms:["安家落户","四海为家","当家作主"]}]},
+ {p:"o",type:"单韵母",tip:"公鸡打鸣 o o o",chars:[
+  {c:"我",py:"wǒ",idioms:["你追我赶","自我陶醉","我行我素"]},
+  {c:"磨",py:"mó",idioms:["好事多磨","临阵磨枪","磨杵成针"]}]}
+]},
+{ name:"魔法森林", emoji:"🌳", items:[
+ {p:"e",type:"单韵母",tip:"白鹅游水 e e e",chars:[
+  {c:"车",py:"chē",idioms:["车水马龙","闭门造车","前车之鉴"]},
+  {c:"鹅",py:"é",idioms:["鹅毛大雪","千里鹅毛","鹅行鸭步"]}]},
+ {p:"i",type:"单韵母",tip:"牙齿对齐 i i i",chars:[
+  {c:"笔",py:"bǐ",idioms:["妙笔生花","笔走龙蛇","神来之笔"]},
+  {c:"力",py:"lì",idioms:["力争上游","身强力壮","同心协力"]}]},
+ {p:"u",type:"单韵母",tip:"乌鸦嘴巴 u u u",chars:[
+  {c:"树",py:"shù",idioms:["树大招风","独树一帜","百年树人"]},
+  {c:"苦",py:"kǔ",idioms:["苦尽甘来","良药苦口","苦口婆心"]}]},
+ {p:"ü",type:"单韵母",tip:"小鱼吐泡 ü ü ü",chars:[
+  {c:"语",py:"yǔ",idioms:["语重心长","自言自语","千言万语"]},
+  {c:"曲",py:"qǔ",idioms:["曲径通幽","异曲同工","曲高和寡"]}]},
+ {p:"ai",type:"复韵母",tip:"a 和 i 挨在一起 ai ai ai",chars:[
+  {c:"来",py:"lái",idioms:["来日方长","继往开来","一来二去"]},
+  {c:"开",py:"kāi",idioms:["开天辟地","茅塞顿开","开卷有益"]}]}
+]},
+{ name:"海底世界", emoji:"🐠", items:[
+ {p:"ei",type:"复韵母",tip:"使劲砍树 ei ei ei",chars:[
+  {c:"黑",py:"hēi",idioms:["黑白分明","起早贪黑","颠倒黑白"]},
+  {c:"北",py:"běi",idioms:["天南地北","南来北往","泰山北斗"]}]},
+ {p:"ui",type:"复韵母",tip:"u 和 i 围一起 ui ui ui",chars:[
+  {c:"回",py:"huí",idioms:["回心转意","回味无穷","浪子回头"]},
+  {c:"贵",py:"guì",idioms:["难能可贵","洛阳纸贵","高抬贵手"]}]},
+ {p:"ao",type:"复韵母",tip:"棉袄棉袄 ao ao ao",chars:[
+  {c:"老",py:"lǎo",idioms:["老当益壮","返老还童","老马识途"]},
+  {c:"桃",py:"táo",idioms:["桃红柳绿","世外桃源","投桃报李"]}]},
+ {p:"ou",type:"复韵母",tip:"莲藕莲藕 ou ou ou",chars:[
+  {c:"手",py:"shǒu",idioms:["手不释卷","心灵手巧","得心应手"]},
+  {c:"头",py:"tóu",idioms:["头头是道","百尺竿头","头重脚轻"]}]},
+ {p:"iu",type:"复韵母",tip:"邮筒邮筒 iu iu iu",chars:[
+  {c:"秋",py:"qiū",idioms:["一叶知秋","秋高气爽","春华秋实"]},
+  {c:"六",py:"liù",idioms:["六神无主","三头六臂","五颜六色"]}]}
+]},
+{ name:"雪花小镇", emoji:"❄️", items:[
+ {p:"ie",type:"复韵母",tip:"椰子椰子 ie ie ie",chars:[
+  {c:"叶",py:"yè",idioms:["叶公好龙","叶落归根","金枝玉叶"]},
+  {c:"别",py:"bié",idioms:["别开生面","天壤之别","别具一格"]}]},
+ {p:"üe",type:"复韵母",tip:"月亮月亮 üe üe üe",chars:[
+  {c:"月",py:"yuè",idioms:["众星捧月","花容月貌","日月如梭"]},
+  {c:"雪",py:"xuě",idioms:["雪中送炭","冰天雪地","雪上加霜"]}]},
+ {p:"er",type:"特殊韵母",tip:"耳朵耳朵 er er er",chars:[
+  {c:"耳",py:"ěr",idioms:["掩耳盗铃","交头接耳","耳目一新"]},
+  {c:"二",py:"èr",idioms:["独一无二","一分为二","数一数二"]}]},
+ {p:"an",type:"前鼻韵母",tip:"天安门 an an an",chars:[
+  {c:"安",py:"ān",idioms:["安然无恙","转危为安","心安理得"]},
+  {c:"汗",py:"hàn",idioms:["汗马功劳","汗流浃背","挥汗如雨"]}]},
+ {p:"en",type:"前鼻韵母",tip:"摁门铃 en en en",chars:[
+  {c:"门",py:"mén",idioms:["门庭若市","程门立雪","双喜临门"]},
+  {c:"本",py:"běn",idioms:["一本正经","本末倒置","变本加厉"]}]}
+]},
+{ name:"云朵城堡", emoji:"☁️", items:[
+ {p:"in",type:"前鼻韵母",tip:"树荫树荫 in in in",chars:[
+  {c:"琴",py:"qín",idioms:["琴棋书画","对牛弹琴","琴瑟和鸣"]},
+  {c:"民",py:"mín",idioms:["国泰民安","忧国忧民","为民请命"]}]},
+ {p:"un",type:"前鼻韵母",tip:"蚊子蚊子 un un un",chars:[
+  {c:"春",py:"chūn",idioms:["春暖花开","妙手回春","春风得意"]},
+  {c:"论",py:"lùn",idioms:["平心而论","高谈阔论","论功行赏"]}]},
+ {p:"ün",type:"前鼻韵母",tip:"白云白云 ün ün ün",chars:[
+  {c:"云",py:"yún",idioms:["行云流水","腾云驾雾","九霄云外"]},
+  {c:"军",py:"jūn",idioms:["异军突起","军令如山","勇冠三军"]}]},
+ {p:"ang",type:"后鼻韵母",tip:"山羊山羊 ang ang ang",chars:[
+  {c:"昂",py:"áng",idioms:["昂首挺胸","斗志昂扬","气宇轩昂"]},
+  {c:"上",py:"shàng",idioms:["锦上添花","蒸蒸日上","喜上眉梢"]}]},
+ {p:"eng",type:"后鼻韵母",tip:"台灯台灯 eng eng eng",chars:[
+  {c:"灯",py:"dēng",idioms:["万家灯火","张灯结彩","灯火辉煌"]},
+  {c:"声",py:"shēng",idioms:["绘声绘色","鸦雀无声","声情并茂"]}]}
+]},
+{ name:"彩虹山顶", emoji:"🏔️", items:[
+ {p:"ing",type:"后鼻韵母",tip:"老鹰老鹰 ing ing ing",chars:[
+  {c:"明",py:"míng",idioms:["明察秋毫","光明磊落","耳聪目明"]},
+  {c:"星",py:"xīng",idioms:["星罗棋布","披星戴月","星移斗转"]}]},
+ {p:"ong",type:"后鼻韵母",tip:"闹钟闹钟 ong ong ong",chars:[
+  {c:"红",py:"hóng",idioms:["面红耳赤","万紫千红","花红柳绿"]},
+  {c:"空",py:"kōng",idioms:["空前绝后","天马行空","空空如也"]}]},
+ {p:"zhi",type:"整体认读音节",tip:"蜘蛛 zhi，整体认读不用拼",chars:[
+  {c:"直",py:"zhí",idioms:["直言不讳","理直气壮","扶摇直上"]},
+  {c:"纸",py:"zhǐ",idioms:["纸上谈兵","跃然纸上","纸短情长"]}]},
+ {p:"chi",type:"整体认读音节",tip:"吃苹果 chi，整体认读不用拼",chars:[
+  {c:"吃",py:"chī",idioms:["吃苦耐劳","大吃一惊","省吃俭用"]},
+  {c:"尺",py:"chǐ",idioms:["得寸进尺","尺短寸长","近在咫尺"]}]},
+ {p:"shi",type:"整体认读音节",tip:"狮子 shi，整体认读不用拼",chars:[
+  {c:"世",py:"shì",idioms:["举世闻名","太平盛世","盖世无双"]},
+  {c:"十",py:"shí",idioms:["十全十美","一五一十","十万火急"]}]}
+]},
+{ name:"时间钟楼", emoji:"🕰️", items:[
+ {p:"ri",type:"整体认读音节",tip:"日出 ri，整体认读不用拼",chars:[
+  {c:"日",py:"rì",idioms:["日上三竿","日久天长","日理万机"]}]},
+ {p:"zi",type:"整体认读音节",tip:"写字 zi，整体认读不用拼",chars:[
+  {c:"子",py:"zǐ",idioms:["正人君子","才子佳人","天之骄子"]},
+  {c:"字",py:"zì",idioms:["字里行间","白纸黑字","字正腔圆"]}]},
+ {p:"ci",type:"整体认读音节",tip:"刺猬 ci，整体认读不用拼",chars:[
+  {c:"词",py:"cí",idioms:["义正词严","理屈词穷","强词夺理"]},
+  {c:"此",py:"cǐ",idioms:["此起彼伏","多此一举","岂有此理"]}]},
+ {p:"si",type:"整体认读音节",tip:"丝绸 si，整体认读不用拼",chars:[
+  {c:"思",py:"sī",idioms:["思前想后","不可思议","集思广益"]},
+  {c:"四",py:"sì",idioms:["四面楚歌","志在四方","四海为家"]}]},
+ {p:"yi",type:"整体认读音节",tip:"大衣 yi，整体认读不用拼",chars:[
+  {c:"意",py:"yì",idioms:["意味深长","诗情画意","意气风发"]},
+  {c:"衣",py:"yī",idioms:["丰衣足食","衣冠楚楚","天衣无缝"]}]}
+]},
+{ name:"宝藏海湾", emoji:"💎", items:[
+ {p:"wu",type:"整体认读音节",tip:"屋子 wu，整体认读不用拼",chars:[
+  {c:"无",py:"wú",idioms:["无忧无虑","旁若无人","无价之宝"]},
+  {c:"物",py:"wù",idioms:["物美价廉","地大物博","庞然大物"]}]},
+ {p:"yu",type:"整体认读音节",tip:"小鱼 yu，整体认读不用拼",chars:[
+  {c:"鱼",py:"yú",idioms:["浑水摸鱼","鱼目混珠","如鱼得水"]},
+  {c:"玉",py:"yù",idioms:["金玉良言","冰清玉洁","抛砖引玉"]}]},
+ {p:"ye",type:"整体认读音节",tip:"爷爷 ye，整体认读不用拼",chars:[
+  {c:"夜",py:"yè",idioms:["夜以继日","三更半夜","夜郎自大"]},
+  {c:"野",py:"yě",idioms:["满山遍野","闲云野鹤","野心勃勃"]}]},
+ {p:"yue",type:"整体认读音节",tip:"月亮 yue，整体认读不用拼",chars:[
+  {c:"跃",py:"yuè",idioms:["龙腾虎跃","欢呼雀跃","跃跃欲试"]},
+  {c:"约",py:"yuē",idioms:["不约而同","约法三章","隐约其辞"]}]},
+ {p:"yuan",type:"整体认读音节",tip:"圆圈 yuan，整体认读不用拼",chars:[
+  {c:"圆",py:"yuán",idioms:["破镜重圆","自圆其说","花好月圆"]},
+  {c:"远",py:"yuǎn",idioms:["任重道远","好高骛远","敬而远之"]}]}
+]},
+{ name:"皇冠殿堂", emoji:"👑", items:[
+ {p:"yin",type:"整体认读音节",tip:"音乐 yin，整体认读不用拼",chars:[
+  {c:"音",py:"yīn",idioms:["余音绕梁","弦外之音","杳无音信"]},
+  {c:"因",py:"yīn",idioms:["因材施教","因祸得福","前因后果"]}]},
+ {p:"yun",type:"整体认读音节",tip:"白云 yun，整体认读不用拼",chars:[
+  {c:"运",py:"yùn",idioms:["时来运转","运筹帷幄","应运而生"]},
+  {c:"云",py:"yún",idioms:["人云亦云","不知所云","云开见日"]}]},
+ {p:"ying",type:"整体认读音节",tip:"老鹰 ying，整体认读不用拼",chars:[
+  {c:"英",py:"yīng",idioms:["英姿飒爽","落英缤纷","英雄辈出"]},
+  {c:"迎",py:"yíng",idioms:["迎刃而解","迎头赶上","迎头痛击"]}]}
+]}
+];
+
+/* 关卡配色 */
+const LEVEL_COLORS = [
+ ["#FF9EC4","#FF7EB3"],["#A78BFA","#8B6FE8"],["#FF9E7A","#FF7E55"],
+ ["#F7B731","#E89B14"],["#7ED9C4","#4FBFA6"],["#87CEEB","#5AB6DE"],
+ ["#FFB6D3","#FF8FBF"],["#A0E7E0","#6FD1C6"],["#C4A6FF","#9F7BE8"],
+ ["#FFC078","#FF9F43"],["#6BCB77","#4CAF62"],["#F78FB3","#E8618C"],
+ ["#FFD93D","#F5B301"]
+];
+const TYPE_COLORS = { "声母":"#FF8FAB", "单韵母":"#7ED9C4", "复韵母":"#87CEEB",
+ "前鼻韵母":"#A78BFA", "后鼻韵母":"#FFB07A", "特殊韵母":"#F7B731", "整体认读音节":"#FF9F43" };
+
+/* ==================== 进度存取 ==================== */
+const SAVE_KEY = "pinyinQuest_v1";
+let progress = { stars: DATA.map(()=>0) };
+function loadProgress(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) { const obj = JSON.parse(raw);
+      if (obj && Array.isArray(obj.stars) && obj.stars.length === DATA.length) progress = obj; }
+  } catch(e){}
+}
+function saveProgress(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch(e){} }
+function totalStars(){ return progress.stars.reduce((a,b)=>a+b,0); }
+
+/* ==================== 工具 ==================== */
+function $(id){ return document.getElementById(id); }
+function shuffle(arr){ const a = arr.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+/* 气泡背景 */
+(function makeBubbles(){
+  const bg = $("bubblesBg");
+  const colors = ["#FFB6D3","#C4A6FF","#7ED9C4","#FFD93D","#87CEEB"];
+  for (let i=0;i<12;i++){
+    const b = document.createElement("div");
+    b.className = "bubble";
+    const size = 20 + Math.random()*50;
+    b.style.width = size+"px"; b.style.height = size+"px";
+    b.style.left = Math.random()*100+"%";
+    b.style.background = colors[i%colors.length];
+    b.style.animationDuration = (14+Math.random()*16)+"s";
+    b.style.animationDelay = (-Math.random()*20)+"s";
+    bg.appendChild(b);
+  }
+})();
+
+/* ==================== 音效 & 朗读 ==================== */
+let audioCtx = null;
+function tone(freq, dur, delay, type, vol){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const t = audioCtx.currentTime + (delay||0);
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type||"sine"; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol||0.18, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t); o.stop(t+dur+0.05);
+  } catch(e){}
+}
+function sfxCorrect(){ tone(660,0.12,0,"triangle"); tone(880,0.18,0.1,"triangle"); }
+function sfxWrong(){ tone(220,0.2,0,"sawtooth",0.1); tone(160,0.25,0.12,"sawtooth",0.1); }
+function sfxStar(){ [523,659,784,1046].forEach((f,i)=>tone(f,0.25,i*0.14,"triangle",0.15)); }
+function sfxClick(){ tone(500,0.06,0,"sine",0.08); }
+function speak(text){
+  try {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "zh-CN"; u.rate = 0.75;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+/* ==================== 撒花 ==================== */
+function confetti(){
+  const colors = ["#FF7EB3","#FFD93D","#7ED9C4","#C4A6FF","#87CEEB","#FF9F43"];
+  for (let i=0;i<70;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    const s = 6 + Math.random()*8;
+    c.style.width = s+"px"; c.style.height = (s*1.6)+"px";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = pick(colors);
+    c.style.animationDuration = (1.6+Math.random()*1.8)+"s";
+    c.style.animationDelay = (Math.random()*0.5)+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4200);
+  }
+}
+function toast(msg){
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1400);
+}
+
+/* ==================== 关卡地图 ==================== */
+function renderMap(){
+  const grid = $("levelGrid");
+  grid.innerHTML = "";
+  DATA.forEach((lv, i)=>{
+    const unlocked = i===0 || progress.stars[i-1] >= 1;
+    const row = document.createElement("div");
+    row.className = "level-row" + (unlocked ? "" : " locked");
+    const stars = progress.stars[i];
+    const starStr = stars>0 ? "⭐".repeat(stars) + "☆".repeat(3-stars) : "🔒 已锁";
+    const [c1,c2] = LEVEL_COLORS[i % LEVEL_COLORS.length];
+    row.innerHTML =
+      '<div class="level-num" style="background:linear-gradient(135deg,'+c1+','+c2+')">'+(i+1)+'</div>'+
+      '<div class="level-info">'+
+        '<div class="level-name">'+lv.emoji+' '+lv.name+(unlocked?'':' 🔒')+'</div>'+
+        '<div class="level-py">'+lv.items.map(it=>it.p).join(" · ")+'</div>'+
+      '</div>'+
+      '<div class="level-stars">'+(unlocked ? (stars>0? starStr : "未挑战") : "")+'</div>';
+    if (unlocked){
+      row.onclick = ()=>{ sfxClick(); openLevel(i); };
+    } else {
+      row.onclick = ()=>{ toast("先闯过第 "+i+" 关才能解锁哦～"); };
+    }
+    grid.appendChild(row);
+  });
+  $("totalStars").textContent = totalStars();
+  const max = DATA.length*3;
+  $("maxStars").textContent = max;
+  if (totalStars() === max && max > 0){
+    setTimeout(()=>{ toast("🎉 恭喜集齐所有星星！"); }, 300);
+  }
+}
+
+/* ==================== 学习页面 ==================== */
+let curLevel = 0, curItem = 0;
+function openLevel(i){
+  curLevel = i; curItem = 0;
+  renderLearn();
+  show("screenLearn");
+}
+function renderLearn(){
+  const lv = DATA[curLevel];
+  const [c1,c2] = LEVEL_COLORS[curLevel % LEVEL_COLORS.length];
+  $("learnBadge").textContent = "第 "+(curLevel+1)+" 关 · "+lv.emoji+lv.name;
+  $("learnBadge").style.background = "linear-gradient(135deg,"+c1+","+c2+")";
+  /* 拼音切换按钮 */
+  const chips = $("learnChips");
+  chips.innerHTML = "";
+  lv.items.forEach((it, idx)=>{
+    const b = document.createElement("button");
+    b.className = "chip" + (idx===curItem ? " active" : "");
+    b.textContent = it.p;
+    b.onclick = ()=>{ sfxClick(); curItem = idx; renderLearn(); };
+    chips.appendChild(b);
+  });
+  const it = lv.items[curItem];
+  const typeColor = TYPE_COLORS[it.type] || "#C4A6FF";
+  let html =
+    '<div class="py-type" style="background:'+typeColor+'">'+it.type+'</div>'+
+    '<div class="big-py" id="bigPy" title="点我听发音">'+it.p+'</div>'+
+    '<div class="py-tip">🎵 '+it.tip+'（点拼音听发音）</div>';
+  it.chars.forEach((ch, ci)=>{
+    const parts = pinyinParts(ch);
+    const tm = TONE_SYMBOLS[parts.tone] || "";
+    let spellLine;
+    if (it.type === "整体认读音节"){
+      spellLine = "🎯 整体认读音节：不用拼，直接读 <b>" + ch.py + "</b>";
+    } else if (parts.ini){
+      spellLine = "🧩 拼一拼：声母 <b>" + parts.ini + "</b> ＋ 韵母 <b>" + parts.fin0 + "</b> ＋ 声调 <b>" + tm + "</b> ＝ <b>" + ch.py + "</b>";
+    } else {
+      spellLine = "🧩 拼一拼：韵母 <b>" + parts.fin0 + "</b> ＋ 声调 <b>" + tm + "</b> ＝ <b>" + ch.py + "</b>";
+    }
+    html +=
+      '<div class="char-block '+(ci===0?'a':'b')+'">'+
+        '<div class="char-head">'+
+          '<span class="char-itself" style="cursor:pointer" title="点我听" onclick="speak(\''+ch.c+'\')">'+ch.c+'</span>'+
+          '<span class="char-py" style="cursor:pointer" title="点我听" onclick="speak(\''+ch.py+'\')">'+ch.py+'</span>'+
+          '<button class="speak-btn" onclick="speak(\''+ch.c+'，'+ch.idioms.join("，")+'\')">🔊</button>'+
+        '</div>'+
+        '<div class="spell-line">'+spellLine+'</div>'+
+        '<div class="idiom-title">📚 由「'+ch.c+'」组成的成语：</div>'+
+        '<div class="idiom-list">'+
+          ch.idioms.map(id=>'<span class="idiom" title="点我听" onclick="speak(\''+id+'\')">'+id+'</span>').join("")+
+        '</div>'+
+      '</div>';
+  });
+  $("learnCard").innerHTML = html;
+  $("bigPy").onclick = ()=> speak(it.type==="声母" ? it.p : it.p);
+  $("prevPy").disabled = curItem===0;
+  $("nextPy").disabled = curItem===lv.items.length-1;
+}
+$("prevPy").onclick = ()=>{ if(curItem>0){ curItem--; sfxClick(); renderLearn(); } };
+$("nextPy").onclick = ()=>{ if(curItem<DATA[curLevel].items.length-1){ curItem++; sfxClick(); renderLearn(); } };
+$("learnBack").onclick = ()=>{ sfxClick(); renderMap(); show("screenMap"); };
+
+/* ==================== 拼音拆分与声调工具 ==================== */
+const INITIALS = ["zh","ch","sh","b","p","m","f","d","t","n","l","g","k","h","j","q","x","r","z","c","s","y","w"];
+const TONE_MARKS = { a:"āáǎà", o:"ōóǒò", e:"ēéěè", i:"īíǐì", u:"ūúǔù", "ü":"ǖǘǚǜ" };
+const TONE_SYMBOLS = ["", "ˉ", "ˊ", "ˇ", "ˋ"];
+function stripTone(py){
+  for (const ch of py){
+    for (const base in TONE_MARKS){
+      const idx = TONE_MARKS[base].indexOf(ch);
+      if (idx >= 0) return { base: py.split(ch).join(base), tone: idx + 1 };
+    }
+  }
+  return { base: py, tone: 0 };
+}
+function addTone(base, tone){
+  if (tone < 1 || tone > 4) return base;
+  const ia = base.indexOf("a"), io = base.indexOf("o"), ie = base.indexOf("e"),
+        iu = base.indexOf("ü"), ii = base.indexOf("i"), iuu = base.indexOf("u");
+  let target = -1;
+  if (ia >= 0) target = ia;
+  else if (io >= 0) target = io;
+  else if (ie >= 0) target = ie;
+  else if (iu >= 0) target = iu;
+  else if (ii >= 0 && iuu >= 0) target = (ii < iuu) ? iuu : ii; /* iu→标在后, ui→标在前 */
+  else if (ii >= 0) target = ii;
+  else if (iuu >= 0) target = iuu;
+  if (target < 0) return base;
+  const ch = base[target];
+  return base.slice(0, target) + TONE_MARKS[ch][tone - 1] + base.slice(target + 1);
+}
+function splitPinyin(py){
+  for (const ini of INITIALS){ if (py.startsWith(ini)) return { ini: ini, fin: py.slice(ini.length) }; }
+  return { ini: "", fin: py };
+}
+function pinyinParts(ch){
+  const sp = splitPinyin(ch.py);
+  let fin0 = stripTone(sp.fin).base;
+  /* j q x y 与 ü 相拼时去掉两点，这里还原成 ü，方便孩子认韵母 */
+  if (["j","q","x","y"].indexOf(sp.ini) >= 0){
+    if (fin0 === "u") fin0 = "ü";
+    else if (fin0 === "ue") fin0 = "üe";
+    else if (fin0 === "un") fin0 = "ün";
+  }
+  return { ini: sp.ini, fin0: fin0, fin: sp.fin, tone: stripTone(ch.py).tone };
+}
+
+/* ==================== 闯关测验（拼音拼写闯关） ==================== */
+let quiz = [], qIndex = 0, qCorrect = 0, qAnswered = false, spellStep = 0, spellMistake = false;
+function allChars(lv){ return lv.items.reduce((a,it)=>a.concat(it.chars),[]); }
+function allCharsAll(){ return DATA.reduce((a,lv)=>a.concat(allChars(lv)),[]); }
+function uniq(arr){ return Array.from(new Set(arr)); }
+
+/* ============ 易混淆拼音对照表 ============ */
+const ALL_FIN = ["a","o","e","i","u","ü","ai","ei","ui","ao","ou","iu","ie","üe","er","an","en","in","un","ün","ang","eng","ing","ong","ia","ua","uo","ian","iao","uan"];
+const ALL_WHOLE = ["zhi","chi","shi","ri","zi","ci","si","yi","wu","yu","ye","yue","yuan","yin","yun","ying"];
+const CONFUSE_INI = {
+  b:["p","d"], p:["b","q"], d:["t","b"], t:["d","q"],
+  g:["k","h"], k:["g","h"], h:["g","k"],
+  n:["l","m"], l:["n","r"], m:["n","f"], f:["t","h"],
+  j:["q","x"], q:["j","p"], x:["j","s"],
+  zh:["z","ch","sh"], ch:["c","zh","sh"], sh:["s","zh","ch"],
+  r:["l","sh"], z:["zh","c","s"], c:["ch","z","s"], s:["sh","z","c"],
+  y:["w"], w:["y"]
+};
+const CONFUSE_FIN = {
+  a:["o","e"], o:["e","uo"], e:["o","er"], i:["u","ü"], u:["ü","i"], ü:["u","i"],
+  ai:["an","ei","ao"], ei:["ie","ai","ui"], ui:["iu","ei","un"], iu:["ui","ou"],
+  ao:["ou","an"], ou:["ao","iu"], ie:["ei","üe"], üe:["ie","ei"], er:["e","o"],
+  an:["ang","en","uan"], en:["eng","an","in"], in:["ing","en","ün"],
+  un:["ün","en","ong"], ün:["un","in"],
+  ang:["an","eng","ong"], eng:["ong","en","ang"], ing:["in","eng","ong"], ong:["eng","ang","un"],
+  ia:["a","ie","iu"], ua:["a","uo","ai"], uo:["o","ua","ou"],
+  ian:["in","an","ang"], iao:["ao","ou","iu"], uan:["an","ang","en"]
+};
+const CONFUSE_WHOLE = {
+  zhi:["chi","shi","zi"], chi:["zhi","shi","ci"], shi:["zhi","chi","si"],
+  ri:["li","shi","yi"], zi:["ci","si","zhi"], ci:["zi","si","chi"], si:["zi","ci","shi"],
+  yi:["yu","ye","yin"], wu:["yu","hu","wa"], yu:["yi","wu","yue"],
+  ye:["yue","yi"], yue:["ye","yuan"], yuan:["yue","yun"],
+  yin:["ying","yi","yun"], yun:["yin","ying","yuan"], ying:["yin","yi"]
+};
+/* 优先取易混淆项做干扰项，不够再随机补齐 */
+function confusable(answer, confuseMap, fallbackPool, n){
+  const out = [];
+  shuffle(confuseMap[answer] || []).forEach(x=>{ if (x !== answer && out.indexOf(x) < 0) out.push(x); });
+  shuffle(fallbackPool).forEach(x=>{ if (x !== answer && out.indexOf(x) < 0) out.push(x); });
+  return out.slice(0, n);
+}
+/* 答错时的辨析小提示 */
+function confuseHint(ans){
+  if (!ans) return "";
+  const F = ["an","en","in","un"], B = ["ang","eng","ing","ong"];
+  if (F.indexOf(ans) >= 0) return "💡 "+ans+" 是前鼻音（舌尖抵上牙床），"+ans+"g 是后鼻音（气从鼻子出），别混哦";
+  if (B.indexOf(ans) >= 0) return "💡 "+ans+" 是后鼻音（气从鼻子出），"+ans.slice(0,-1)+" 才是前鼻音，注意区分";
+  if (ans === "ün") return "💡 ün 是小鱼 ü 加 n（两点不能丢）；un 是乌鸦 u 加 n";
+  if (ans === "un") return "💡 un 是乌鸦 u 加 n；ün 才是小鱼 ü（有两点）";
+  if (["zh","ch","sh"].indexOf(ans) >= 0) return "💡 "+ans+" 是翘舌音（舌头翘起来），"+ans[0]+" 是平舌音（舌尖放平）";
+  if (["z","c","s"].indexOf(ans) >= 0) return "💡 "+ans+" 是平舌音（舌尖放平），"+ans+"h 才是翘舌音";
+  if (ans === "n") return "💡 n 是鼻音（气从鼻子出），l 是边音（气从舌头两边出）";
+  if (ans === "l") return "💡 l 是边音（气从舌头两边出），n 是鼻音（气从鼻子出）";
+  if (ans === "b") return "💡 右下半圆 b b b，左下半圆是 d";
+  if (ans === "d") return "💡 左下半圆 d d d，右下半圆是 b";
+  if (ans === "p") return "💡 右上半圆 p p p，左上半圆是 q";
+  if (ans === "q") return "💡 左上半圆 q q q，右上半圆是 p";
+  if (ans === "ui") return "💡 ui 是 u 在前 i 在后；iu 是 i 在前 u 在后";
+  if (ans === "iu") return "💡 iu 是 i 在前 u 在后；ui 是 u 在前 i 在后";
+  if (ans === "ü") return "💡 ü 是小鱼吐泡泡（有两点），u 是乌鸦（没有点）";
+  if (ans === "u") return "💡 u 是乌鸦（没有点），ü 才是小鱼（有两点）";
+  if (ans === "ie") return "💡 ie 读“椰”，ei 读“诶”，顺序不一样";
+  if (ans === "ei") return "💡 ei 读“诶”，ie 读“椰”，顺序不一样";
+  if (ans === "üe") return "💡 üe 是小鱼 ü 加 e（月），ie 是 i 加 e（椰）";
+  return "";
+}
+
+function buildQuiz(){
+  const lv = DATA[curLevel];
+  const qs = [];
+  lv.items.forEach(it=>{
+    const ch = pick(it.chars);
+    const parts = pinyinParts(ch);
+    const whole = (it.type === "整体认读音节");
+    let kind;
+    if (whole){
+      /* 整体认读音节不拆分，考辨声调或选读音 */
+      kind = Math.random() < 0.5 ? "tone" : "whole";
+    } else {
+      const r = Math.random();
+      kind = r < 0.4 ? "spell" : r < 0.6 ? "initial" : r < 0.8 ? "final" : "tone";
+      if (!parts.ini && (kind === "spell" || kind === "initial")) kind = Math.random() < 0.5 ? "final" : "tone";
+    }
+    const q = { kind, ch, parts, whole };
+    if (kind === "initial"){
+      q.options = shuffle([parts.ini].concat(confusable(parts.ini, CONFUSE_INI, INITIALS, 3)));
+      q.answer = parts.ini;
+    } else if (kind === "final"){
+      q.options = shuffle([parts.fin0].concat(confusable(parts.fin0, CONFUSE_FIN, ALL_FIN, 3)));
+      q.answer = parts.fin0;
+    } else if (kind === "tone"){
+      const st = stripTone(ch.py);
+      q.options = shuffle([1,2,3,4].map(t=>addTone(st.base, t)));
+      q.answer = ch.py;
+    } else if (kind === "whole"){
+      const base = stripTone(ch.py).base;
+      q.options = shuffle([base].concat(confusable(base, CONFUSE_WHOLE, ALL_WHOLE, 3)));
+      q.answer = base;
+    } else { /* spell 两步拼读 */
+      q.iniOptions = shuffle([parts.ini].concat(confusable(parts.ini, CONFUSE_INI, INITIALS, 3)));
+      q.finOptions = shuffle([parts.fin0].concat(confusable(parts.fin0, CONFUSE_FIN, ALL_FIN, 3)));
+    }
+    qs.push(q);
+  });
+  return shuffle(qs);
+}
+function startQuiz(){
+  quiz = buildQuiz(); qIndex = 0; qCorrect = 0;
+  const lv = DATA[curLevel];
+  const [c1,c2] = LEVEL_COLORS[curLevel % LEVEL_COLORS.length];
+  $("quizBadge").textContent = "第 "+(curLevel+1)+" 关 · "+lv.emoji+lv.name;
+  $("quizBadge").style.background = "linear-gradient(135deg,"+c1+","+c2+")";
+  renderQuestion();
+  show("screenQuiz");
+}
+function revealText(q){
+  const p = q.parts;
+  if (q.whole) return q.ch.c + " " + q.ch.py + " —— 整体认读音节，不用拼，直接读";
+  if (p.ini) return q.ch.c + " " + q.ch.py + " ＝ 声母 " + p.ini + " ＋ 韵母 " + p.fin0 + "（" + p.fin + "）";
+  return q.ch.c + " " + q.ch.py + " ＝ 韵母 " + p.fin0 + "（" + p.fin + "）";
+}
+function renderQuestion(){
+  qAnswered = false;
+  const q = quiz[qIndex];
+  $("quizDots").innerHTML = quiz.map((_,i)=>
+    '<div class="q-dot'+(i<qIndex?" done":(i===qIndex?" now":""))+'"></div>').join("");
+  $("qCount").textContent = "第 "+(qIndex+1)+" / "+quiz.length+" 题 · 已答对 "+qCorrect+" 题";
+  const c = q.ch.c;
+  if (q.kind === "initial") $("qPrompt").innerHTML = "听一听，选出“"+c+"”的<b>声母</b>";
+  else if (q.kind === "final") $("qPrompt").innerHTML = "听一听，选出“"+c+"”的<b>韵母</b>";
+  else if (q.kind === "tone") $("qPrompt").innerHTML = "“"+c+"”的正确<b>读音</b>是哪个？";
+  else if (q.kind === "whole") $("qPrompt").innerHTML = "“"+c+"”的<b>读音</b>是哪个？";
+  else $("qPrompt").innerHTML = "拼一拼：“"+c+"”的拼音";
+  $("qPrompt").style.cursor = "pointer";
+  $("qPrompt").onclick = ()=> speak(c);
+  $("qChar").textContent = c;
+  $("qChar").onclick = ()=> speak(c);
+  $("qFeedback").innerHTML = "";
+  $("spellBuilt").textContent = "";
+  if (q.kind === "spell"){ spellStep = 0; spellMistake = false; renderSpellStep(q); }
+  else {
+    const opts = $("qOptions");
+    opts.innerHTML = "";
+    q.options.forEach(opt=>{
+      const b = document.createElement("button");
+      b.className = "opt-btn";
+      b.textContent = opt;
+      b.onclick = ()=> answer(b, opt, q);
+      opts.appendChild(b);
+    });
+  }
+  setTimeout(()=>speak(c), 350);
+}
+function nextQuestion(){
+  if (qIndex < quiz.length - 1){ qIndex++; renderQuestion(); }
+  else finishQuiz();
+}
+function answer(btn, val, q){
+  if (qAnswered) return;
+  qAnswered = true;
+  const buttons = document.querySelectorAll("#qOptions .opt-btn");
+  buttons.forEach(b=>b.disabled = true);
+  const fb = $("qFeedback");
+  const correct = (val === q.answer);
+  if (correct){
+    qCorrect++;
+    btn.classList.add("correct"); sfxCorrect();
+    fb.innerHTML = '<span class="good">'+pick(["拼对啦！🎉","答对啦！👏","真厉害！🌟","完全正确！🥳","好样的！💪"])+'</span>'+
+      '<div class="q-reveal">'+revealText(q)+'</div>';
+  } else {
+    btn.classList.add("wrong");
+    buttons.forEach(b=>{ if (b.textContent === q.answer) b.classList.add("correct"); });
+    sfxWrong();
+    const tip = confuseHint(q.answer);
+    fb.innerHTML = '<span class="bad">😅 正确答案：'+q.answer+'</span>'+
+      '<div class="q-reveal">'+revealText(q)+(tip ? '<br>'+tip : '')+'</div>';
+  }
+  setTimeout(nextQuestion, correct ? 1200 : 2000);
+}
+/* --- 两步拼读题 --- */
+function renderSpellStep(q){
+  qAnswered = false;
+  const opts = $("qOptions");
+  opts.innerHTML = "";
+  const label = document.createElement("div");
+  label.className = "spell-label";
+  label.textContent = spellStep === 0 ? "第一步：选出声母" : "第二步：选出韵母";
+  opts.appendChild(label);
+  const list = spellStep === 0 ? q.iniOptions : q.finOptions;
+  list.forEach(opt=>{
+    const b = document.createElement("button");
+    b.className = "opt-btn";
+    b.textContent = opt;
+    b.onclick = ()=> spellAnswer(b, opt, q);
+    opts.appendChild(b);
+  });
+  updateSpellBuilt(q, false);
+}
+function updateSpellBuilt(q, finished){
+  const p = q.parts;
+  let txt;
+  if (spellStep === 0) txt = "＿ ＋ ＿ ＝ ？";
+  else if (!finished) txt = p.ini + " ＋ ＿ ＝ ？";
+  else txt = p.ini + " ＋ " + p.fin0 + " ＝ " + q.ch.py;
+  $("spellBuilt").textContent = txt;
+}
+function spellAnswer(btn, val, q){
+  if (qAnswered) return;
+  qAnswered = true;
+  const buttons = document.querySelectorAll("#qOptions .opt-btn");
+  buttons.forEach(b=>b.disabled = true);
+  if (spellStep === 0){
+    if (val === q.parts.ini){
+      btn.classList.add("correct"); sfxCorrect();
+    } else {
+      spellMistake = true; btn.classList.add("wrong"); sfxWrong();
+      buttons.forEach(b=>{ if (b.textContent === q.parts.ini) b.classList.add("correct"); });
+    }
+    setTimeout(()=>{ spellStep = 1; renderSpellStep(q); }, val === q.parts.ini ? 750 : 1400);
+  } else {
+    const fb = $("qFeedback");
+    const finOK = (val === q.parts.fin0);
+    if (finOK) btn.classList.add("correct");
+    else {
+      btn.classList.add("wrong");
+      buttons.forEach(b=>{ if (b.textContent === q.parts.fin0) b.classList.add("correct"); });
+    }
+    const correct = finOK && !spellMistake;
+    if (correct){
+      qCorrect++; sfxCorrect();
+      fb.innerHTML = '<span class="good">拼对啦！'+q.ch.py+' 🎉</span>'+
+        '<div class="q-reveal">'+revealText(q)+'</div>';
+    } else {
+      sfxWrong();
+      const hint = (!finOK) ? "韵母选错啦" : "声母那一步选错了哦";
+      const tip = confuseHint(!finOK ? q.parts.fin0 : q.parts.ini);
+      fb.innerHTML = '<span class="bad">😅 '+hint+'，正确答案见下方</span>'+
+        '<div class="q-reveal">'+revealText(q)+(tip ? '<br>'+tip : '')+'</div>';
+    }
+    updateSpellBuilt(q, true);
+    setTimeout(nextQuestion, correct ? 1300 : 2100);
+  }
+}
+$("quizBack").onclick = ()=>{
+  sfxClick();
+  if (confirm("确定要放弃本次闯关吗？进度将不会保存。")){
+    renderMap(); show("screenMap");
+  }
+};
+
+/* ==================== 结果页 ==================== */
+function finishQuiz(){
+  const lv = DATA[curLevel];
+  const n = quiz.length;
+  const ratio = qCorrect / n;
+  let stars = 0;
+  if (ratio === 1) stars = 3;
+  else if (ratio >= 0.6) stars = 2;
+  else if (ratio >= 0.4) stars = 1;
+  if (stars > progress.stars[curLevel]) progress.stars[curLevel] = stars;
+  saveProgress();
+  const passed = stars >= 1;
+  const last = curLevel === DATA.length-1;
+  const [c1,c2] = LEVEL_COLORS[curLevel % LEVEL_COLORS.length];
+  let title, msg, emoji;
+  if (ratio === 1){ emoji="🏆"; title="满分通关！"; msg="太厉害了，一个都没错！你是拼音小天才！"; }
+  else if (passed){ emoji="🎉"; title="闯关成功！"; msg="很棒哦！回去复习一下错题，下次拿满星！"; }
+  else { emoji="💪"; title="差一点点！"; msg="别灰心，先回学习卡复习一下，再来挑战吧！"; }
+  let html =
+    '<div class="result-emoji">'+emoji+'</div>'+
+    '<div class="result-title">'+title+'</div>'+
+    '<div class="result-stars">'+
+      [1,2,3].map(i=>'<span class="star">'+(i<=stars?"⭐":"☆")+'</span>').join("")+
+    '</div>'+
+    '<div class="result-msg">'+msg+'</div>'+
+    '<div class="result-score">本关「'+lv.name+'」：答对 '+qCorrect+' / '+n+' 题</div>'+
+    '<div class="result-btns">'+
+      '<button class="result-btn" style="background:linear-gradient(135deg,#B8A4D8,#9B8EC8);" onclick="retry()">🔁 再闯一次</button>'+
+      '<button class="result-btn" style="background:linear-gradient(135deg,'+c1+','+c2+');" onclick="goMap()">🗺️ 回到地图</button>'+
+      (passed && !last ? '<button class="result-btn" style="background:linear-gradient(135deg,#FF9A76,#FF6B9B);" onclick="nextLevel()">➡️ 下一关</button>' : '')+
+    '</div>';
+  if (passed && last && totalStars() >= DATA.length*3){
+    html += '<div style="margin-top:16px;font-size:16px;color:var(--purple);font-weight:bold;">👑 你已集齐全部星星，拼音大王就是你！</div>';
+  }
+  $("resultCard").innerHTML = html;
+  show("screenResult");
+  if (stars === 3){ sfxStar(); confetti(); }
+  else if (passed){ sfxStar(); }
+}
+function retry(){ sfxClick(); startQuiz(); }
+function goMap(){ sfxClick(); renderMap(); show("screenMap"); }
+function nextLevel(){ sfxClick(); curLevel++; curItem = 0; renderLearn(); show("screenLearn"); }
+
+/* ==================== 启动 ==================== */
+$("startQuiz").onclick = ()=>{ sfxClick(); startQuiz(); };
+$("resetBtn").onclick = ()=>{
+  if (confirm("确定要清空所有闯关进度和星星吗？")){
+    progress = { stars: DATA.map(()=>0) };
+    saveProgress(); renderMap(); toast("进度已重置");
+  }
+};
+loadProgress();
+renderMap();
+</script>
+</body>
+</html>
